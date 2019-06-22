@@ -19,10 +19,9 @@ http://www.opensource.org/licenses/mit-license.php
 typedef struct sw_serial
 {
     gpio_num_t rxPin, txPin;
-    uint32_t bitTime;
+    uint32_t buffSize, bitTime, rx_start_time, rx_end_time;
     bool invert, overflow;
     volatile uint32_t inPos, outPos;
-    int buffSize;
     uint8_t *buffer;
 } SwSerial;
 
@@ -85,14 +84,7 @@ uint32_t getCycleCount()
 static void IRAM_ATTR sw_rx_handler(void *args)
 {
     SwSerial *self = (SwSerial *)args;
-
-    // Advance the starting point for the samples but compensate for the
-    // initial delay which occurs before the interrupt is delivered
-
-    // uint32_t wait_time = self->bitTime + self->bitTime / 3 - 500, start_time = getCycleCount();
-
-    uint32_t start_time = self->bitTime / 9;
-    uint32_t end_time = self->bitTime * 8 / 9;
+    
     uint8_t rec = 0;
 
     portMUX_TYPE mux = portMUX_INITIALIZER_UNLOCKED;
@@ -102,7 +94,7 @@ static void IRAM_ATTR sw_rx_handler(void *args)
     // But myself not need, so need extra added by yourself
 
     // Wait Start Bit To Start
-    WaitBitTime(start_time);
+    WaitBitTime(self->rx_start_time);
     if (0 == gpio_get_level(self->rxPin))
     {
         for (uint8_t i = 0; i != 8; i++)
@@ -115,7 +107,7 @@ static void IRAM_ATTR sw_rx_handler(void *args)
             }
         }
         // Wait Start Bit To End
-        WaitBitTime(end_time);
+        WaitBitTime(self->rx_end_time);
         if (1 == gpio_get_level(self->rxPin))
         {
             // Stop bit Allow Into RecvBuffer
@@ -204,10 +196,32 @@ int sw_read(SwSerial *self)
     return -1;
 }
 
+// suggest max datalen <= 256 and baudRate <= 115200
 bool sw_open(SwSerial *self, uint32_t baudRate)
 {
     // The oscilloscope told me
     self->bitTime = (esp_clk_cpu_freq() / baudRate);
+
+    // Rx bit Timing Settings
+    switch (baudRate)
+    {
+        case 115200:
+            self->rx_start_time = (self->bitTime / 256);
+            self->rx_end_time = (self->bitTime * 127 / 256);
+            break;
+        
+        case 9600:
+            self->rx_start_time = (self->bitTime / 9);
+            self->rx_end_time = (self->bitTime * 8 / 9);
+            break;
+        
+        default: // tested 57600 len 256
+            self->rx_start_time = (self->bitTime / 9);
+            self->rx_end_time = (self->bitTime * 8 / 9);
+            break;
+    }
+    
+    printf("sw_open %u %d\n", self->rx_start_time, self->rx_end_time);
 
     sw_write(self, 0x00); // Initialization uart link
 
