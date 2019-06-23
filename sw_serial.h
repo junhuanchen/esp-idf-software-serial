@@ -132,7 +132,7 @@ static void IRAM_ATTR sw_rx_handler(void *args)
     // Esp32 GPIO.status_w1tc interrupt auto recovery
 }
 
-bool sw_enableRx(SwSerial *self, bool State)
+esp_err_t sw_enableRx(SwSerial *self, bool State)
 {
     esp_err_t error = ESP_OK;
     if (State)
@@ -148,7 +148,7 @@ bool sw_enableRx(SwSerial *self, bool State)
         gpio_uninstall_isr_service();
     }
     
-    return error == ESP_OK;
+    return error;
 }
 
 int sw_write(SwSerial *self, uint8_t byte)
@@ -197,7 +197,7 @@ int sw_read(SwSerial *self)
 }
 
 // suggest max datalen <= 256 and baudRate <= 115200
-bool sw_open(SwSerial *self, uint32_t baudRate)
+esp_err_t sw_open(SwSerial *self, uint32_t baudRate)
 {
     // The oscilloscope told me
     self->bitTime = (esp_clk_cpu_freq() / baudRate);
@@ -221,14 +221,14 @@ bool sw_open(SwSerial *self, uint32_t baudRate)
             break;
     }
     
-    printf("sw_open %u %d\n", self->rx_start_time, self->rx_end_time);
+    // printf("sw_open %u %d\n", self->rx_start_time, self->rx_end_time);
 
     sw_write(self, 0x00); // Initialization uart link
 
     return sw_enableRx(self, true);
 }
 
-bool sw_stop(SwSerial *self)
+esp_err_t sw_stop(SwSerial *self)
 {
     return sw_enableRx(self, false);
 }

@@ -18,18 +18,32 @@ int app_main()
         
         sw_open(tmp, 115200); // 115200 > 9600
 
-        puts("sw_write test");
+        // puts("sw_write test");
 
-        for (size_t i = 0; i < 256; i++)
+        // for (size_t i = 0; i < 256; i++)
+        // {
+        //     sw_write(tmp, (uint8_t)i);
+        // }
+        
+        puts("sw_write test");
+        for (size_t i = 0; i < 127; i++)
         {
             sw_write(tmp, (uint8_t)i);
         }
-        
+        vTaskDelay(500 / portTICK_RATE_MS);
+
+        puts("sw_write test");
+        for (size_t i = 127; i < 256; i++)
+        {
+            sw_write(tmp, (uint8_t)i);
+        }
+        vTaskDelay(500 / portTICK_RATE_MS);
+
         while (true)
         {
             
-            vTaskDelay(5000 / portTICK_RATE_MS);
-            
+            vTaskDelay(1000 / portTICK_RATE_MS);
+            puts("check recvd data");
             int len = sw_any(tmp);
             
             if (len > 0)
