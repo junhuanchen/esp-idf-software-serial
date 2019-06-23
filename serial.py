@@ -1,15 +1,22 @@
 
+# Github: junhuanchen
+# Copyright (c) 2018 Juwan
+# Licensed under the MIT license:
+# http://www.opensource.org/licenses/mit-license.php
+
+import time
 import machine
 import serial
 
 
-class software_serial:
+class uart:
 
     def __init__(self, tx=22, rx=21, Inverse=False, buffSize=512):
         self.port = serial.new(tx, rx, Inverse, buffSize)
 
     def __del__(self):
-        serial.del(self.port)
+        # pass  # will reset
+        serial.delete(self.port)
 
     def any(self):
         return serial.any(self.port)
@@ -28,19 +35,21 @@ class software_serial:
 
 
 def unit_test():
-    t = serial.new(22, 21, False, 512)
-    serial.stop(t)
-    serial.open(t, 115200)
-    serial.write(t, 0x11)
-    serial.write(t, 0x11)
-    serial.any(t)
-    serial.read(t)
+    try:
+        com = uart(22, 21, False, 512)
+        com.open(9600)
 
-    # tmp = software_serial()
+        while True:
+            time.sleep(1)
+            if com.any() > 0:
+                print(hex(com.read()))
 
-    # tmp.write(0x12)
+            com.write(0x11)
 
-    # tmp.__del__()
+    except Exception as e:
+        print(e)
+    finally:
+        com.__del__()
 
 
 if __name__ == "__main__":
