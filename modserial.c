@@ -31,6 +31,8 @@ STATIC mp_obj_t serial_new(size_t n_args, const mp_obj_t *args) {
         SwSerial *self = sw_new(mp_obj_get_int(TxPin), mp_obj_get_int(RxPin), mp_obj_get_int(Inverse), mp_obj_get_int(buffSize));
         // printf("%d %d %d %d\n", mp_obj_get_int(TxPin), mp_obj_get_int(RxPin), mp_obj_get_int(Inverse), mp_obj_get_int(buffSize));
         if (self != NULL) {
+            // sw_open(self, 115200);
+            // sw_stop(self);
             return MP_OBJ_FROM_PTR(self);
         }
     }
@@ -39,7 +41,8 @@ STATIC mp_obj_t serial_new(size_t n_args, const mp_obj_t *args) {
 STATIC MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN(serial_new_obj, 0, 4, serial_new);
 
 STATIC mp_obj_t serial_del(mp_obj_t self) {
-    sw_del((SwSerial *)self);
+    SwSerial *tmp = (SwSerial *)self;
+    sw_del(tmp);
     return mp_const_none;
 }
 STATIC MP_DEFINE_CONST_FUN_OBJ_1(serial_del_obj, serial_del);
@@ -114,4 +117,3 @@ const mp_obj_module_t serial_module = {
     .base = { &mp_type_module },
     .globals = (mp_obj_dict_t*)&serial_module_globals,
 };
-
