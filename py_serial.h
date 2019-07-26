@@ -110,7 +110,7 @@ SwSerial *sw_new(gpio_num_t Tx, gpio_num_t Rx, bool Inverse, int buffSize)
 
         }
 
-        free(tmp);
+        free(tmp), tmp = NULL;
 
     }
 
