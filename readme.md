@@ -4,6 +4,14 @@ Github Arduino [Esp32-SoftwareSerial](https://github.com/junhuanchen/Esp32-Softw
 
 花了点时间写了一下软串口，因为娱乐和工程需要，所以我从过去自己在 Arduino 上实现的软串口移植到 ESP-IDF 下，为此也写一周了吧，使用硬件为 Bpi：Uno （esp32）。
 
+
+
+> 更新了一次 esp8266 rtos 用的软串口，大概只做到了 57600 这个范围内稳定使用，但开头总有一两个字节要出错，应该是硬件电平上的干扰，持续使用是没有问题的。
+>
+> soft_urat_esp8285_57600.c
+
+
+
 ## 本模块的意义是？
 
 大多数传感器接口，会采用 9600 的通信协议，而 ESP32 的硬串口很少（其中一个无法进行发送数据），举例来说，如果我们想要集成了 GRPS 模块、RS232 模块、MicroPython REPL、XX 串口传感器的模块，此时怎样都不够用，所以软串口可以解决此问题。
