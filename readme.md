@@ -9,6 +9,7 @@ Github Arduino [Esp32-SoftwareSerial](https://github.com/junhuanchen/Esp32-Softw
 > 更新了一次 esp8266 rtos 用的软串口，大概只做到了 57600 这个范围内稳定使用，但开头总有一两个字节要出错，应该是硬件电平上的干扰，持续使用是没有问题的。
 >
 > soft_urat_esp8285_57600.c
+> 更新后的博文 https://www.cnblogs.com/juwan/p/13772185.html
 
 
 
