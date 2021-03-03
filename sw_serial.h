@@ -13,6 +13,7 @@ http://www.opensource.org/licenses/mit-license.php
 
 #include <esp_clk.h>
 #include <driver/gpio.h>
+#include <soc/cpu.h>
 
 #define SW_EOF -1 
 
@@ -72,9 +73,7 @@ void sw_del(SwSerial *self)
 
 uint32_t getCycleCount()
 {
-    uint32_t ccount;
-    __asm__ __volatile__("esync; rsr %0,ccount":"=a" (ccount));
-    return ccount;
+    return esp_cpu_get_ccount();
 }
 
 #define WaitBitTime(wait) \
